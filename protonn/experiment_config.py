@@ -3,7 +3,7 @@ import os
 import platform
 import sys
 from pathlib import Path
-
+import json
 import yaml
 
 from protonn.utils import get_time_str
@@ -77,7 +77,14 @@ class BaseConfig(dict):
             # TODO: it's hacky, but for the time being for langmo
             # ideally should be a list of names to concat into path
             if "model_name" in self:
-                self["path_results"] = os.path.join(self["path_results"], self["model_name"])
+            	if os.path.exists(self["model_name"]) and self["model_name"].endswith(".json"):
+            		with open(self["model_name"], mode="r") as f:
+            			cfg = json.load(f)
+            			model_name = cfg["model_type"]
+            	else:
+            		model_name = self["model_name"]
+
+                self["path_results"] = os.path.join(self["path_results"], model_name)
             # TODO: extract nicemodel name from metadata
             # model_name = self["model_name"].split("/")[-1]
             # self["path_results"] = os.path.join(self["path_results"], model_name)
